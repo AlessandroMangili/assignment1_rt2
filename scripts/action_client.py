@@ -1,5 +1,29 @@
 #! /usr/bin/env python
 
+## @package assignment2_rt
+# \file action_client.py
+# \brief The user can set or remove a specific goal to make the robot moves.
+# \author Alessandro Mangili
+# \version 1.0
+# \date 9/03/2025
+#
+# \details
+#
+# Subscribes to: <BR>
+#   /odom
+#
+# Publishes to: <BR>
+#   /robot_information
+#
+# Description: <BR>
+# The code creates an action client that interacts with the user, allowing them to:
+# 1. Set a new target goal
+# 2. Delete the active goal
+# 3. Exit the program
+# The action client sends the user's request to the action server. If the request is to add a new target goal, the server adds it and initiates the robot's movement. 
+# If the request is to cancel the active goal, the server checks for an active or pending goal, if one exists, it cancels it and notifies the action client of the deletion.
+
+
 import rospy
 import actionlib
 from actionlib import GoalStatus
@@ -7,12 +31,17 @@ import assignment2_rt.msg
 from assignment2_rt.msg import Robot_info
 from nav_msgs.msg import Odometry
 
-def odom_callback(msg):
-    ##
-    # \brief The function is a callback that retrieve the position and velocity from the /odom topic 
-    # \param msg Is the callback message containing the position and velocity informations
-    #
-    
+pub_position_vel = None # Global variable that contains the publisher information.
+
+##
+# \brief The callback function of the subscriber 
+# \param msg The message contains the position and velocity information
+#
+# \return None
+#
+# The function retrieves the robot's position and velocity from the /odom topic and publishes this information to the /robot_information topic
+#
+def odom_callback(msg):    
     global pub_position_vel
     
     robot_info = Robot_info()
@@ -23,52 +52,54 @@ def odom_callback(msg):
 
     pub_position_vel.publish(robot_info)
 
-def feedback_callback(feedback):
-    ##
-    # \brief The function is a callback that checks whether the robot has reached the target
-    # \param feedback Is the message containing the information sent by the action server
-    #
-      
+##
+# \brief The callback function of the action client
+# \param feedback The message contains the status of the active goal provided by the action server
+#
+# \return None
+#
+# The function checks whether the robot has reached the target by evaluating the feedback status, if it has, it alerts the user by printing a message on the console
+#
+def feedback_callback(feedback):     
     if (feedback.stat == "Target reached!"):
         print("")
         rospy.logwarn("Target reached\n{}\nStatus: {}\n".format(feedback.actual_pose, feedback.stat))
         print("Command (s=set goal, c=cancel goal, q=quit): ")
 
-def send_goal(client, x, y):   
-    ##
-    # \brief The function set the position of the target goal and send it to the action server
-    # \param client The instance of the action client
-    # \param x The x coordinate of the target goal
-    # \param y The y coordinate of the target goal
-    #
-     
-    # Creates a goal to send to the action server.
+##
+# \brief The function sets a new goal
+# \param client The instance of the action client
+# \param x The x coordinate of the target goal
+# \param y The y coordinate of the target goal
+#
+# \return None
+#
+# The function sets the position of the target goal (x and y coordinates) using the provided parameters and send it to the action server
+#
+def send_goal(client, x, y):        
     goal = assignment2_rt.msg.PlanningGoal()
     goal.target_pose.pose.position.x = x
     goal.target_pose.pose.position.y = y
     
-    goal.target_pose.pose.position.z = 0.0      # Not supported by two wheels's robot
-    goal.target_pose.pose.orientation.x = 0.0   # Not supported by the action server
-    goal.target_pose.pose.orientation.y = 0.0   # Not supported by the action server
-    goal.target_pose.pose.orientation.z = 0.0   # Not supported by the action server
-    goal.target_pose.pose.orientation.w = 0.0   # Not supported by the action server
+    goal.target_pose.pose.position.z = 0.0      
+    goal.target_pose.pose.orientation.x = 0.0  
+    goal.target_pose.pose.orientation.y = 0.0  
+    goal.target_pose.pose.orientation.z = 0.0   
+    goal.target_pose.pose.orientation.w = 0.0   
 
-    # Sends the goal to the action server.
     client.send_goal(goal, feedback_cb=feedback_callback)
     rospy.loginfo("Goal sent")
     
-    # Waits for the server to finish performing the action.
-    #client.wait_for_result()
-
-    # Prints out the result of executing the action
-    #return client.get_result()
-    
-def cancel_goal(client):
-    ##
-    # \brief The function is used to cancel a active goal if there it is, otherwise it will prompt a message error
-    # \param client The instance of the action client
-    #
-    
+##
+# \brief The function cancels an active goal
+# \param client The instance of the action client
+#
+# \return None
+#
+# The function cancels an active or pending goal by sending a request to the action server. If no active or pending goal exists, it prompts a warning message.
+# If the cancellation request fails, the function prompt a warning message
+#
+def cancel_goal(client):    
     if client.get_state() in [GoalStatus.ACTIVE, GoalStatus.PENDING]:
         rospy.loginfo("Cancelling current goal")
         client.cancel_goal()
@@ -81,11 +112,15 @@ def cancel_goal(client):
     else:
         rospy.logwarn("No active goal to cancel.")
 
-def get_input():
-    ##
-    # \brief The function asks to the user to enter the x and y coordinates of the target goal
-    # \return The x and y coordinates converted as float
-    
+##
+# \brief The input function
+#
+# \return The x and y coordinates of the target goal, converted to float
+#
+# The function prompts the user to enter the x and y coordinates of the target goal. If the user enters a non-numeric value, it notifies the error
+# by displaying a warning message
+#
+def get_input():    
     while True:
         try:
             x = float(input("Enter the value for setting the x coordinate: "))
@@ -94,22 +129,24 @@ def get_input():
         except ValueError:
             rospy.logwarn("Input not valid, enter only numbers!")
 
-def main():
-    ##
-    # \brief The main fuction handles the publisher and subscriber and creates a client action to communicate the user's choise to the action server, that could be send goal, cancel goal or exit the program.
-    #
-    
+##
+# \brief The main fuction
+#
+# \return None
+#
+# The function manages both a publisher and subscriber, and creates a client action to communicate the user's choise to the action server. The possible choise are:
+#   - 's': send a new target goal
+#   - 'c': cancel an active or pending goal
+#   - 'q': exit the program
+#
+def main():    
     global pub_position_vel
     rospy.init_node('action_client')
 
-    # Create the publisher for postion and velocity
     pub_position_vel = rospy.Publisher('/robot_information', Robot_info, queue_size=10)
-    # Wait for the arrival of the first message on that topic
     rospy.wait_for_message('/odom', Odometry)
-    # Subscribe to /odom topic for retrieve the data from the robot
     rospy.Subscriber('/odom', Odometry, odom_callback)
     
-    # Creates the SimpleActionClient, passing the type of the action (PlanningAction) to the constructor
     client = actionlib.SimpleActionClient('/reaching_goal', assignment2_rt.msg.PlanningAction)
     rospy.loginfo("Waiting that the action server is avaible")
     client.wait_for_server()
