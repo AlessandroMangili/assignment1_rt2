@@ -1,7 +1,7 @@
 # Assignment 2 (Part I) - Action Client and Service Node for Robot Navigation
 
 ## Overview
-This project involves creating a ROS package named `assignment2_rt` that implements two key components to move the robot by setting a goal to reach. These components are:
+This project involves creating a ROS package named `assignment1_rt2` that implements two key components to move the robot by setting a goal to reach. These components are:
 
 1. **Action Client Node (node1)**: an action client that allows the user to set a goal or cancel it, and publishes, on the `/robot_information` topic, the custom message `Robot_info` composed of the following fields:
     - `float64 x`
@@ -42,13 +42,13 @@ The `simulation.launch` file initializes the action client, service nodes, and a
   ```bash
   cd ~/catkin_ws/src
   ```
-- Clone the `assignment2_rt` package repository:
+- Clone the `assignment1_rt2` package repository:
   ```bash
-  git clone https://github.com/AlessandroMangili/assignment2_rt
+  git clone https://github.com/AlessandroMangili/assignment1_rt2
   ```
 -  Enter the repo and switch to the `ros1` branch:
     ```bash
-    cd assignment2_rt
+    cd assignment1_rt2
     git switch ros1
     ```
 
@@ -78,7 +78,7 @@ The `simulation.launch` file initializes the action client, service nodes, and a
 ### 4.1. Start the Simulation from launch file
 - Open the terminal and run the whole simulation
   ```bash
-  roslaunch assignment2_rt simulation.launch
+  roslaunch assignment1_rt2 simulation.launch
   ```
   A second terminal will be opened, allowing the user to interact to set or cancel the goal.
 ### 4.2 (Optional) Call to the service node

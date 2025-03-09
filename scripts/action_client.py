@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-## @package assignment2_rt
+## @package assignment1_rt2
 # \file action_client.py
 # \brief The user can set or remove a specific goal to make the robot moves.
 # \author Alessandro Mangili
@@ -20,15 +20,16 @@
 # 1. Set a new target goal
 # 2. Delete the active goal
 # 3. Exit the program
+#
 # The action client sends the user's request to the action server. If the request is to add a new target goal, the server adds it and initiates the robot's movement. 
 # If the request is to cancel the active goal, the server checks for an active or pending goal, if one exists, it cancels it and notifies the action client of the deletion.
-
+#
 
 import rospy
 import actionlib
 from actionlib import GoalStatus
-import assignment2_rt.msg
-from assignment2_rt.msg import Robot_info
+import assignment1_rt2.msg
+from assignment1_rt2.msg import Robot_info
 from nav_msgs.msg import Odometry
 
 pub_position_vel = None # Global variable that contains the publisher information.
@@ -77,7 +78,7 @@ def feedback_callback(feedback):
 # The function sets the position of the target goal (x and y coordinates) using the provided parameters and send it to the action server
 #
 def send_goal(client, x, y):        
-    goal = assignment2_rt.msg.PlanningGoal()
+    goal = assignment1_rt2.msg.PlanningGoal()
     goal.target_pose.pose.position.x = x
     goal.target_pose.pose.position.y = y
     
@@ -147,7 +148,7 @@ def main():
     rospy.wait_for_message('/odom', Odometry)
     rospy.Subscriber('/odom', Odometry, odom_callback)
     
-    client = actionlib.SimpleActionClient('/reaching_goal', assignment2_rt.msg.PlanningAction)
+    client = actionlib.SimpleActionClient('/reaching_goal', assignment1_rt2.msg.PlanningAction)
     rospy.loginfo("Waiting that the action server is avaible")
     client.wait_for_server()
     

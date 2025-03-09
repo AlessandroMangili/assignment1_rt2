@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
-## @package assignment2_rt
-# \file action_client.py
+## @package assignment1_rt2
+# \file retrieve_last_goal_service.py
 # \brief When called, returns the last goal set, if present.
 # \author Alessandro Mangili
 # \version 1.0
@@ -22,8 +22,8 @@
 
 
 import rospy
-from assignment2_rt.msg import PlanningActionGoal
-from assignment2_rt.srv import Target, TargetResponse
+from assignment1_rt2.msg import PlanningActionGoal
+from assignment1_rt2.srv import Target, TargetResponse
 
 last_target = None  # Global variable that contains the last goal set.
 
