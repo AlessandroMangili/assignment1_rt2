@@ -10,10 +10,10 @@
 # \details
 #
 # Subscribe to: <BR>
-#   /reaching_goal/goal
+#   * /reaching_goal/goal topic for obtaining information about the goal set by the action server
 #
-# Service to: <BR>
-#   /get_last_goal
+# Service: <BR>
+#   * /get_last_goal return the last set goal
 #
 # Description: <BR>
 # The code implements a service that, when called, returns the last goal set by the user, if present, otherwise it returns an empty response.

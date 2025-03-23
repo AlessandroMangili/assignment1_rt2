@@ -10,10 +10,13 @@
 # \details
 #
 # Subscribes to: <BR>
-#   /odom
+#   * /odom topic for receives information on the robot's position and velocity
 #
 # Publishes to: <BR>
-#   /robot_information
+#   * /robot_information topic for publishing the robot's position and velocity
+#
+# Service: <BR>
+#   * /reaching_goal to move the robot by sending actions to the action server
 #
 # Description: <BR>
 # The code creates an action client that interacts with the user, allowing them to:
